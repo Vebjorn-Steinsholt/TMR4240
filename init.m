@@ -7,11 +7,14 @@
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-clear all;
+clear; clc; close all;
 
 load('thrusters_sup.mat')
 load('supply.mat');
 load('supplyABC.mat');
+
+SimulationParam
+windCoefficients
 
 % Initial position x, y, z, phi, theta, psi
 eta0 = [0,0,0,0,0,0]';
