@@ -7,8 +7,6 @@
 %                                                                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-clear all;
-
 load('thrusters_sup.mat')
 load('supply.mat');
 load('supplyABC.mat');
