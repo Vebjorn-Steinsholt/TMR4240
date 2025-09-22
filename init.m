@@ -20,3 +20,10 @@ windCoefficients
 eta0 = [0,0,0,0,0,0]';
 % Initial velocity u, v, w, p, q, r
 nu0 = [0,0,0,0,0,0]';
+
+t_end = 3000;
+dt = 0.01;
+
+[xd_setpoint, t] = setPointGen(3, t_end, dt);
+
+simin = timeseries(xd_setpoint(1:3,:),t);

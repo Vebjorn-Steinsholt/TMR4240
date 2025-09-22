@@ -1,6 +1,9 @@
+function [xd,t] = setPointGen(spModeIn, T_final, timeStep)
+%SETPOINTGEN Summary of this function goes here
+%   Detailed explanation goes here
 
 %% Generate set-points for simulation tests
-spMode = 3; % 1: [0 0 0], 2: single waypoint, 3: multi waypoint
+spMode = spModeIn; % 1: [0 0 0], 2: single waypoint, 3: multi waypoint
 
 % Position and attitude ref model, based on Fossen, 2021
 omega11 = 0.05; omega22 = 0.035; omega33 = 0.04;        % natural freq.
@@ -20,8 +23,8 @@ f_pa = @(xd, r) Ad*xd + Bd*r;
 
 %% Simulation
 % Simulation parameters
-dt = 0.01;          % Time step
-t_final = 3000;      % Final time
+dt = timeStep;          % Time step
+t_final = T_final;      % Final time
 t = 0:dt:t_final;   % Time vector
 N = length(t);
 
@@ -95,3 +98,4 @@ grid on; axis equal;
 xlabel('y [m]');
 ylabel('x [m]');
 title('XY Trajectory');
+end
