@@ -26,18 +26,20 @@ nu0 = [0,0,0,0,0,0]';
 
 
 currentFlag = 1;
-windFlag = 1;
+windFlag = 0;
 % PID parameters
 Kp = diag([3.5e5   5.8e5   6.7e6]);
-Ki = diag([800 800 2300]);
-Kd = diag([1800 1800 8300]);
+Ki = diag([0 0 0]);
+Kd = diag([0 0 0]);
 
-t_end = 8000;
+t_end = 2000;
 dt = 0.01;
 
 [xd_setpoint, t] = setPointGen(dpMode, t_end, dt);
 
 simin = timeseries(xd_setpoint(1:3,:),t);
+
+disp(ship_states)
 
 %% Functions
 
