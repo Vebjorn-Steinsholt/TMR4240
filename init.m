@@ -13,7 +13,7 @@ load('thrusters_sup.mat')
 load('supply.mat');
 load('supplyABC.mat');
 
-[dpMode, ~, ~] = simOptions();
+[dpMode, currentMode, windFlag] = simOptions();
 
 SimulationParam
 windCoefficients
@@ -24,22 +24,49 @@ eta0 = [0,0,0,0,0,0]';
 % Initial velocity u, v, w, p, q, r
 nu0 = [0,0,0,0,0,0]';
 
+windAngle = 0;
 
-currentFlag = 1;
-windFlag = 0;
 % PID parameters
-Kp = diag([3.5e5   5.8e5   6.7e6]);
-Ki = diag([0 0 0]);
-Kd = diag([0 0 0]);
+Kp = diag([5e6   2e6   8e5]);
+Ki = diag([1e4 1e4 1e4]);
+Kd = diag([3e4 3e4 0]);
 
-t_end = 2000;
+t_end = 1000;
 dt = 0.01;
 
 [xd_setpoint, t] = setPointGen(dpMode, t_end, dt);
 
 simin = timeseries(xd_setpoint(1:3,:),t);
 
-disp(ship_states)
+%% --- Run Simulink model and extract outputs ---
+mdl = 'part1';
+
+% Ensure Simulink uses variables from this script's workspace
+simOut = sim(mdl, 'SrcWorkspace','current');
+
+% Extract simulation outputs
+t_ship = simOut.tout;
+X_ship = reshape(simOut.ship_states, 12, [])';
+F_env = simOut.env_forces;
+
+% %% --- Example plots ---
+% % 1) Ship states (12 states). Adjust labels to match your state ordering.
+% figure('Name','Ship States (12x1)','NumberTitle','off');
+% % for i = width(x_ship)
+% plot(t_ship, X_ship(1,:), 'LineWidth', 1); grid on;
+% xlabel('Time [s]');
+% ylabel('State value');
+% title('Ship States');
+% legend(compose('x_%d',1:12), 'Location','bestoutside');
+% 
+% % 2) Environmental forces (12 components)
+% figure('Name','Environmental Forces (12x1)','NumberTitle','off');
+% plot(t_env, F_env, 'LineWidth', 1); grid on;
+% xlabel('Time [s]');
+% ylabel('Force / Moment');
+% title('Environmental Forces');
+% legend(compose('f_%d',1:12), 'Location','bestoutside');
+
 
 %% Functions
 

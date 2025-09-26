@@ -67,35 +67,35 @@ for k = 1:N-1
     xd(:,k+1) = rk4(@(x) f_pa(x, r), dt, xd(:,k));
 end
 
-%% Plot results
-
-% x and y over time
-figure;
-plot(t, xd(1,:), 'r', 'LineWidth', 1.5); hold on;
-plot(t, xd(2,:), 'g', 'LineWidth', 1.5);
-grid on;
-xlabel('Time [s]');
-ylabel('Position [m]');
-legend('$x$','$y$','Interpreter','latex');
-title('Position vs. Time');
-
-%% psi over time (in radians)
-psi = wrapToPi(xd(3,:));   % keep angle between -pi and pi
-
-figure;
-plot(t, psi, 'b', 'LineWidth', 1.5);
-grid on;
-xlabel('Time [s]');
-ylabel('Heading $\psi$ [rad]','Interpreter','latex');
-legend('$\psi$','Interpreter','latex');
-title('Heading vs. Time');
-
-
-% XY trajectory
-figure;
-plot(xd(2,:), xd(1,:), 'k', 'LineWidth', 1.5);
-grid on; axis equal;
-xlabel('y [m]');
-ylabel('x [m]');
-title('XY Trajectory');
-end
+% %% Plot results
+% 
+% % x and y over time
+% figure;
+% plot(t, xd(1,:), 'r', 'LineWidth', 1.5); hold on;
+% plot(t, xd(2,:), 'g', 'LineWidth', 1.5);
+% grid on;
+% xlabel('Time [s]');
+% ylabel('Position [m]');
+% legend('$x$','$y$','Interpreter','latex');
+% title('Position vs. Time');
+% 
+% %% psi over time (in radians)
+% psi = wrapToPi(xd(3,:));   % keep angle between -pi and pi
+% 
+% figure;
+% plot(t, psi, 'b', 'LineWidth', 1.5);
+% grid on;
+% xlabel('Time [s]');
+% ylabel('Heading $\psi$ [rad]','Interpreter','latex');
+% legend('$\psi$','Interpreter','latex');
+% title('Heading vs. Time');
+% 
+% 
+% % XY trajectory
+% figure;
+% plot(xd(2,:), xd(1,:), 'k', 'LineWidth', 1.5);
+% grid on; axis equal;
+% xlabel('y [m]');
+% ylabel('x [m]');
+% title('XY Trajectory');
+% end
