@@ -31,7 +31,7 @@ Kp = diag([7.8e5   9.8e5   1.5e8]);
 Ki = diag([8.5e3 7.5e3 3.5e4]);
 Kd = diag([9.3e5 7e5 4e6]);
 
-t_end = 600;
+t_end = 500;
 dt = 0.01;
 
 [xd_setpoint, t] = setPointGen(dpMode, t_end, dt);
