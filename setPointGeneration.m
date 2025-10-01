@@ -9,6 +9,12 @@ zeta11 = 1; zeta22 = 1; zeta33 = 1;                 % relative damping coeff.
 Omega = diag([omega11 omega22 omega33]);
 Delta = diag([zeta11 zeta22 zeta33]);
 
+% Velocity bound
+v_max = [1.0 1.0 0.5]'; % [u_max, v_max, r_max]
+v_min = [-1.0 -1.0 -0.5]'; % [u_min, v_min, r_min]
+% stauration function
+saturate_vec = @(v, v_min, v_max) max(min(v, v_max), v_min);
+
 % Third order state-space representation
 Ad = [zeros(3)                       eye(3)                   zeros(3);
       zeros(3)                     zeros(3)                   eye(3);
@@ -62,6 +68,7 @@ for k = 1:N-1
     r = waypoints(:,wp_idx);
 
     xd(:,k+1) = rk4(@(x) f_pa(x, r), dt, xd(:,k));
+    xd(4:6, k+1) = saturate_vec(xd(4:6, k+1), v_min, v_max);
 end
 
 %% Plot results
