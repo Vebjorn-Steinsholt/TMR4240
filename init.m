@@ -34,14 +34,13 @@ Kd = diag([9.3e5 7e5 4e6]);
 t_end = 200;
 dt = 0.01;
 
+% Generate vessel trajectory
 [xd_setpoint, t] = setPointGen(dpMode, t_end, dt);
 
 simin = timeseries(xd_setpoint(1:3,:),t);
 
-%% --- Run Simulink model and extract outputs ---
+% Run Simulink model and extract outputs
 mdl = 'part1';
-
-% Ensure Simulink uses variables from this script's workspace
 simOut = sim(mdl, 'SrcWorkspace','current');
 
 % Extract simulation outputs
@@ -50,11 +49,12 @@ X_ship = reshape(simOut.ship_states, 12, [])';
 F_env = simOut.env_forces;
 
 %% Plots
-% Extract ship states (positions & heading)
+% Extract vessel states (positions & heading)
 x_ship   = X_ship(:,1);   % surge position (x)
 y_ship   = X_ship(:,2);   % sway position (y)
 psi_ship = X_ship(:,6);   % heading (yaw)
 
+% Extract vessel states (velocities)
 u_ship   = X_ship(:,7);   % surge rate (u)
 v_ship   = X_ship(:,8);   % sway rate (v)
 r_ship   = X_ship(:,12);  % yaw rate (r)
@@ -102,8 +102,10 @@ else
 end
 
 % Position and heading: surge (x), sway (y), yaw rate (psi)
+figure;
+
 % Surge (x)
-figure; subplot(3,1,1)
+subplot(3,1,1)
 plot(t_ship, x_ship, 'LineWidth',1.5); hold on;
 plot(t_ship, x_ref,  '--', 'LineWidth',1.5);
 grid on; ylabel('x [m]'); title('Surge (position)');
@@ -168,11 +170,10 @@ plot(x_ref(1),  y_ref(1),  'o', 'MarkerSize',6, 'HandleVisibility','off');
 
 %% Functions
 
+% Generate set-points for marine vessel simulation
 function [xd,t] = setPointGen(spModeIn, T_final, timeStep)
-%SETPOINTGEN Summary of this function goes here
-%   Detailed explanation goes here
 
-% Generate set-points for simulation tests
+
 spMode = spModeIn; % 1: [0 0 0], 2: single waypoint, 3: multi waypoint, 4: No ref. model
 
 % Position and attitude ref model, based on Fossen, 2021
@@ -244,7 +245,7 @@ end
 
 end
 
-% UI for choosing DP operation 
+ % UI for choosing DP operation
 function [userDPMode, userCurrent, userWind] = simOptions()
 
 f = figure('Position', [400, 200, 400, 600], ...
