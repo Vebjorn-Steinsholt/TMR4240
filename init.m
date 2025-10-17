@@ -50,7 +50,7 @@ dt = 0.01;
 simin = timeseries(xd_setpoint(1:3,:),t);
 
 % Run Simulink model and extract outputs
-mdl = 'part1';
+mdl = 'part2';
 simOut = sim(mdl, 'SrcWorkspace','current');
 
 % Extract simulation outputs
