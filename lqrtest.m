@@ -35,3 +35,5 @@ Cc = [eye(3) zeros(3,6)];
 [K, ~, ~] = lqr(Ac, Bc, Cc'*Q*Cc,R);
 
 G = -K;
+
+disp(G)
