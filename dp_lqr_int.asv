@@ -1,4 +1,4 @@
-function G = dp_lqr(eta)
+function G = dp_lqr_int(eta)
 
 
 M = [7.0184e6       0           0;
@@ -32,6 +32,9 @@ Ac = [zeros(3) J_reduced zeros(3);
 Bc = [zeros(3) zeros(3) -Athr]';
 
 Cc = [eye(3) zeros(3,6)];
+
+% Integral action
+Aa = []
 
 [K, ~, ~] = lqr(Ac, Bc, Cc'*Q*Cc,R);
 
