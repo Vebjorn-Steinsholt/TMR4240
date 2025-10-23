@@ -35,3 +35,4 @@ Cc = [eye(3) zeros(3,6)];
 
 [G1,G2] = lqtracker(Ac, Bc, Cc, Q, R);
 
+end
