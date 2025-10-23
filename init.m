@@ -26,7 +26,7 @@ windCoefficients
 windAngle = 0;
 
 % LQR Controller
-G = 
+G = dp_lqr(eta0);
 
 t_end = 200;
 dt = 0.01;
