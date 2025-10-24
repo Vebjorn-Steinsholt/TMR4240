@@ -43,8 +43,7 @@ QI1 = 1; QI2 = 1; QI6 = 1;
 QI = diag([QI1, QI2, QI6]);
 
 
-
-[K, ~, ~] = lqr(Aa, Ba, Cc'*Q*Cc,R);
+[K, ~, ~] = lqr(Ac, Bc, Cc'*Q*Cc,R);
 
 G = -K;
 
