@@ -33,7 +33,7 @@ Bc = [zeros(3) zeros(3) -Athr]';
 
 Cc = [eye(3) zeros(3,6)];
 
-[K, ~, ~] = lqr(Ac, Bc, Cc'*Q*Cc,R);
+[K, ~, ~] = lqr(Ac, Bc, Q,R);
 
 G = -K;
 

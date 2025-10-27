@@ -37,8 +37,14 @@ Cc = [eye(3) zeros(3,6)];
 Aa = [eye(3) Cc;
       eye(9,3) Ac];
 
+Ba = [zeros(3); Bc];
 
-[K, ~, ~] = lqr(Ac, Bc, Cc'*Q*Cc,R);
+QI1 = 1; QI2 = 1; QI6 = 1;
+QI = diag([QI1, QI2, QI6]);
+
+
+
+[K, ~, ~] = lqr(Aa, Ba, Cc'*Q*Cc,R);
 
 G = -K;
 
