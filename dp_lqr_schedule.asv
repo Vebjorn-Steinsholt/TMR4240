@@ -1,6 +1,9 @@
-function G = dp_lqr(eta)
+clear;
 
-
+psi_deg = 0:5:360;
+psi_rad = deg2rad(psi_deg);
+n_angles = length(psi_deg)
+;
 M = [7.0184e6       0           0;
         0       8.5464e6    -4.4678e7;
         0       -4.5028e5   4.0504e9];
@@ -20,6 +23,7 @@ Q = diag([Q1 Q2 Q6]);
 R1 = 1.56e-12; R2 = 1.56e-12; R3 = 2.5e-17;
 R = diag([R1 R2 R3]);
 
+
 [J, ~, ~] = eulerang(eta(4),eta(5),eta(6));
 
 idx = [1 2 6];
@@ -36,5 +40,3 @@ Cc = [eye(3) zeros(3,6)];
 [K, ~, ~] = lqr(Ac, Bc, Q ,R);
 
 G = -K;
-
-end

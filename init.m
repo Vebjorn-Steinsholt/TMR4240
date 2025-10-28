@@ -26,7 +26,7 @@ nu0 = [0,0,0,0,0,0]';
 
 windAngle = 0;
 
-G = dp_lqr(eta0);
+load('DP_gain_lookup.mat');
 
 t_end = 500;
 dt = 0.01;
