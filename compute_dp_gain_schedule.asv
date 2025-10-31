@@ -1,4 +1,4 @@
-function G = dp_lqr_int(eta)
+function G = compute_dp_gain_schedule(eta)
 
 
 M = [7.0184e6       0           0;

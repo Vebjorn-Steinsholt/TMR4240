@@ -1,0 +1,45 @@
+clear dp_lqr_intAct; clc;
+
+load supply;
+
+% Mass-inertia matrix from problem description
+M = [7.0184e6       0           0;
+        0       8.5464e6    -4.4678e7;
+        0       -4.5028e5   4.0504e9];
+
+% % Mass-inertia matrix from supply
+% MRB = vessel.MRB; MA = vessel.A;
+% M = MRB + MA;
+% 
+% idx = [1 2 6];
+% M_reduced = M(idx, idx);
+
+Minv = M\eye(3);
+
+% Linear damping matrix from problem description
+D = [2.6486e5       0           0; 
+        0       8.8164e5        0;
+        0           0       3.3774e8];
+
+
+% Thruster limits
+T_surge = 1; T_sway = 1; T_yaw = 1;
+A_thr = -diag([1/T_surge 1/T_sway 1/T_yaw]);
+
+% Rotational matrix
+J = eye(3);
+
+% State space representation
+Ac = [zeros(3)  J         zeros(3);
+      zeros(3) -Minv*D   -Minv;
+      zeros(3)  zeros(3)  A_thr];
+
+Bc = [zeros(3); zeros(3); -A_thr];
+
+% Optimal feedback gain
+Q = diag([1, 1, 1, 0, 0, 0, 0, 0, 0]); % State weighting matrix
+R = diag([1, 1, 1]); % Control weighting matrix
+
+[K, ~, ~] = lqr(Ac, Bc, Q, R);
+
+G = -K;

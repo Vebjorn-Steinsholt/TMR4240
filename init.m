@@ -26,10 +26,11 @@ nu0 = [0,0,0,0,0,0]';
 
 windAngle = 0;
 
-load('DP_gain_lookup.mat');
+compute_dp_gain_schedule();
+load("dp_gain_schedule.mat");
 
 t_end = 500;
-dt = 0.01;
+dt = 0.1;
 
 %Non-linear Observer
 % Mass matrix (M = MRB + MA)
@@ -132,7 +133,7 @@ mu_w = 0.001;
 % Generate vessel trajectory
 [xd_setpoint, t] = setPointGen(dpMode, t_end, dt);
 
-simin = timeseries(xd_setpoint(1:3,:),t);
+simin = timeseries(xd_setpoint(1:6,:),t);
 
 % Run Simulink model and extract outputs
 mdl = 'part2';
