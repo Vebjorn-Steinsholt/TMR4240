@@ -26,8 +26,9 @@ nu0 = [0,0,0,0,0,0]';
 
 windAngle = 0;
 
-compute_integral_dp_gain_schedule();
-load("dp_gain_schedule_integral.mat");
+% PID controller
+[Kp, Ki, Kd] = init_pid();
+
 
 t_end = 200;
 h = 0.1;
