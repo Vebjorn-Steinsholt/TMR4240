@@ -26,11 +26,11 @@ nu0 = [0,0,0,0,0,0]';
 
 windAngle = 0;
 
-compute_dp_gain_schedule();
-load("dp_gain_schedule.mat");
+compute_integral_dp_gain_schedule();
+load("dp_gain_schedule_integral.mat");
 
-t_end = 500;
-dt = 0.1;
+t_end = 200;
+h = 0.1;
 
 %Non-linear Observer
 % Mass matrix (M = MRB + MA)
@@ -141,19 +141,19 @@ simOut = sim(mdl, 'SrcWorkspace','current');
 
 % Extract simulation outputs
 t_ship = simOut.tout;
-X_ship = reshape(simOut.ship_states, 12, [])';
-F_env = simOut.env_forces;
+X_ship = reshape(simOut.actual_values, 6, [])';
+%F_env = simOut.env_forces;
 
 %% Plots
 % Extract vessel states (positions & heading)
 x_ship   = X_ship(:,1);   % surge position (x)
 y_ship   = X_ship(:,2);   % sway position (y)
-psi_ship = X_ship(:,6);   % heading (yaw)
+psi_ship = X_ship(:,3);   % heading (yaw)
 
 % Extract vessel states (velocities)
-u_ship   = X_ship(:,7);   % surge rate (u)
-v_ship   = X_ship(:,8);   % sway rate (v)
-r_ship   = X_ship(:,12);  % yaw rate (r)
+u_ship   = X_ship(:,4);   % surge rate (u)
+v_ship   = X_ship(:,5);   % sway rate (v)
+r_ship   = X_ship(:,6);  % yaw rate (r)
 
 % Extract reference from xd_setpoint 
 x_ref_full   = xd_setpoint(1,:).';
@@ -206,7 +206,7 @@ plot(t_ship, x_ship, 'LineWidth',1.5); hold on;
 plot(t_ship, x_ref,  '--', 'LineWidth',1.5);
 grid on; ylabel('x [m]'); title('Surge (position)');
 legend('Ship','Reference','Location','best');
-ylim(posXLim);
+%ylim(posXLim);
 
 % Sway (y)
 subplot(3,1,2)
@@ -214,7 +214,7 @@ plot(t_ship, y_ship, 'LineWidth',1.5); hold on;
 plot(t_ship, y_ref,  '--', 'LineWidth',1.5);
 grid on; ylabel('y [m]'); title('Sway (position)');
 legend('Ship','Reference','Location','best');
-ylim(posYLim);
+%ylim(posYLim);
 
 % Heading (psi)
 subplot(3,1,3);
@@ -222,7 +222,7 @@ plot(t_ship, psi_ship_deg, 'LineWidth',1.5); hold on;
 plot(t_ship, psi_ref_deg,  '--', 'LineWidth',1.5);
 grid on; ylabel('$\psi$ [deg]'); xlabel('Time [s]'); title('Heading');
 legend('Ship','Reference','Location','best');
-ylim(headingLim);
+%ylim(headingLim);
 
 % Rates: surge (u), sway (v), yaw rate (r)
 figure; 
@@ -233,7 +233,7 @@ plot(t_ship, u_ship, 'LineWidth',1.5); hold on;
 plot(t_ship, u_ref,  '--', 'LineWidth',1.5);
 grid on; ylabel('u [m/s]'); title('Surge rate');
 legend('Ship','Reference','Location','best');
-ylim([-2.1, 2.1]);
+%ylim([-2.1, 2.1]);
 
 % Sway rate (v)
 subplot(3,1,2)
@@ -241,7 +241,7 @@ plot(t_ship, v_ship, 'LineWidth',1.5); hold on;
 plot(t_ship, v_ref,  '--', 'LineWidth',1.5);
 grid on; ylabel('v [m/s]'); title('Sway rate');
 legend('Ship','Reference','Location','best');
-ylim([-2.1, 2.1]);
+%ylim([-2.1, 2.1]);
 
 % Yaw rate (r)
 subplot(3,1,3)
@@ -249,7 +249,7 @@ plot(t_ship, r_ship_deg, 'LineWidth',1.5); hold on;
 plot(t_ship, r_ref_deg,  '--', 'LineWidth',1.5);
 grid on; ylabel('r [deg/s]'); xlabel('Time [s]'); title('Yaw rate');
 legend('Ship','Reference','Location','best');
-ylim([-1.5, 1.5]);
+%ylim([-1.5, 1.5]);
 
 % --- XY plot (plan view): ship trajectory vs reference trajectory ---
 figure('Name','XY Trajectory (Surge vs Sway)','Color','w');
@@ -259,7 +259,7 @@ grid on; axis equal;
 xlabel('y [m]'); ylabel('x [m]');
 title('Plan View: x-y Trajectory');
 legend('Ship','Reference','Location','best');
-xlim(posYLim); ylim(posXLim);
+%xlim(posYLim); ylim(posXLim);
 
 % Optional: start markers and heading arrows
 plot(x_ship(1), y_ship(1), 'o', 'MarkerSize',6, 'HandleVisibility','off');

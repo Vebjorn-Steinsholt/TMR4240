@@ -1,7 +1,7 @@
 function compute_dp_gain_schedule()
     % load supply;
     
-    % Your system matrices
+    % System matrices
     M = [7.0184e6       0           0;
             0       8.5464e6    -4.4678e7;
             0       -4.5028e5   4.0504e9];
