@@ -27,10 +27,10 @@ nu0 = [0,0,0,0,0,0]';
 windAngle = 0;
 
 % PID controller
-[Kp, Ki, Kd] = init_pid();
+[Kp, Ki, Kd] = init_pid(vessel);
 
 
-t_end = 200;
+t_end = 400;
 h = 0.1;
 
 %Non-linear Observer
