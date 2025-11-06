@@ -26,10 +26,11 @@ nu0 = [0,0,0,0,0,0]';
 
 windAngle = 0;
 
-compute_integral_dp_gain_schedule();
-load("dp_gain_schedule_integral.mat");
+% PID controller
+[Kp, Ki, Kd] = init_pid(vessel);
 
-t_end = 200;
+
+t_end = 400;
 h = 0.1;
 
 %Non-linear Observer
