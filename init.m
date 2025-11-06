@@ -105,7 +105,7 @@ Kappa = 0.0026;
 L = 1800; 
 U_bar = 10;
 
-f = linspace(0.001, 0.1, 200);
+f = linspace(0.001, 0.01, 200);
 df = f(2)-f(1);                       
 phaseAngle = 2*pi*rand(1, numel(f));
 
