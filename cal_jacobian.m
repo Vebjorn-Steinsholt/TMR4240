@@ -96,16 +96,6 @@ F_jacobian = jacobian(f_x, x_state);
 disp('Jacobian matrix calculated successfully!')
 disp(' ')
 
-%% Display Jacobian Structure
-disp('=== JACOBIAN MATRIX STRUCTURE ===')
-disp('Size: 15x15')
-disp(' ')
-disp('Block structure:')
-disp('F = [dxi_dot/dxi     |  0              |  0       |  0        ]')
-disp('    [0              |  deta_dot/deta  |  0       |  deta_dot/dnu]')
-disp('    [0              |  0              |  db_dot/db|  0        ]')
-disp('    [dnu_dot/dxi    |  dnu_dot/deta   |  dnu_dot/db| dnu_dot/dnu]')
-disp(' ')
 
 %% Extract Key Jacobian Blocks
 
