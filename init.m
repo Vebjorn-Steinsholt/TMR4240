@@ -30,7 +30,7 @@ windAngle = 0;
 [Kp, Ki, Kd] = init_pid(vessel);
 
 
-t_end = 400;
+t_end = 800;
 h = 0.1;
 
 %Non-linear Observer
@@ -275,7 +275,7 @@ function [xd,t] = setPointGen(spModeIn, T_final, timeStep)
 spMode = spModeIn; % 1: [0 0 0], 2: single waypoint, 3: multi waypoint, 4: No ref. model
 
 % Position and attitude ref model, based on Fossen, 2021
-T11 = 50; T22 = 60; T33 = 80;
+T11 = 200; T22 = 300; T33 = 500;
 
 omega11 = 2*pi/T11; omega22 = 2*pi/T22; omega33 = 2*pi/T33; % natural freq.
 zeta11 = 1; zeta22 = 1; zeta33 = 1;               % relative damping coeff.

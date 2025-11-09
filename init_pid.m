@@ -7,7 +7,7 @@ U = 0; % Assuming forward speed U = 0
 psi = 0; % Heading angle
 beta = deg2rad(135); % Wave direction
 
-plotFlag = 1;
+plotFlag = 0;
 
 omega_p = 0.8; % Peak frequencies [rad/s]
 
@@ -36,7 +36,7 @@ D = vessel.B_eq(idx, idx, 1 , 1);
 
 %% Nonlinear PID Pole-placement 
 % Computing PID-gains using Algorithem 15.2 from (Fossen, 2021)
-omega_b1 = 0.12; omega_b2 = 0.12; omega_b6 = 0.08;
+omega_b1 = 0.03; omega_b2 = 0.03; omega_b6 = 0.01;
 omega_b = [omega_b1, omega_b2, omega_b6];
 Omega_b = diag(omega_b);
 
@@ -53,19 +53,19 @@ Omega_n = diag(omega_n);
 % Assuming roll, pitch and yaw is small => J_Theta(eta) = I
 Kp = M*Omega_n^2;
 
-Kd = 2.*M*Zeta_pid*Omega_n + D; 
+Kd = 2.*M*Zeta_pid*Omega_n;% + D; 
 
 Ki = 0.10*Kp*Omega_n;
 
 % %% Tuneable gains
 % % Proportional gains
-% Kp = diag([400e3, 400e3, 800e6]);
+% Kp = diag([4e3, 4e3, 8e4]);
 % 
 % % Derivative gains
-% Kd = diag([800e3, 800e3, 1600e6]);
+% Kd = diag(0*[800e3, 800e3, 1600e6]);
 % 
 % % Integral gains
-% Ki = diag([20e3, 20e3, 40e6]);
+% Ki = diag(0*[20e3, 20e3, 40e6]);
 
 
 
