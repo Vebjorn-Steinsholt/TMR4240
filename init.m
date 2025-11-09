@@ -77,7 +77,7 @@ T_inv = T_mat\eye(3);
 zeta_ni = 1;
 zeta_i = 0.1;
 w_i = pi/10;
-w_ci = 0.13*pi;
+w_ci = 1.3*pi;
 %diagonla values
 k11 = -2*(zeta_ni-zeta_i)*w_ci/w_i;
 k12 = 2*w_i*(zeta_ni-zeta_i);
@@ -92,11 +92,11 @@ K1 = [k11 0 0;
       0 k12 0;
       0 0 k12;];
 K2 = [k2 0 0;
-      0 k2*4 0;
+      0 k2 0;
       0 0 k2];
-K4 = [7.0184e6*100      0              0;
-     0        10.5464e6*10    0;
-     0       0   4.0504e9];
+K4 = [7.0184e6      0              0;
+     0        10.5464e6    0;
+     0       0   4.0504e9]*0.1;
 K3 = [7.0184e6*0.1      0              0;
      0        10.5464e6*0.1   0;
      0       0   4.0504e9*0.1];
@@ -135,6 +135,9 @@ psi_wind_0 = deg2rad(180);
 psi_max = psi_wind_0 + deg2rad(5);
 psi_min = psi_wind_0 - deg2rad(5);
 mu_w = 0.001;
+
+% varying current 
+psi_current = deg2rad(90);
 
 % Generate vessel trajectory
 [xd_setpoint, t] = setPointGen(dpMode, t_end, dt);
