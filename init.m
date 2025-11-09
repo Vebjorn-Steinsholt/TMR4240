@@ -32,7 +32,7 @@ f_max = [125; 150; 125; 300; 300] * 1000;
 f0 = f_max/1000;
 
 % PID controller
-[Kp, Ki, Kd, A_eq, B_eq] = init_pid(vessel);
+[Kp, Ki, Kd, M_pid] = init_pid(vessel);
 
 
 t_end = 200;
