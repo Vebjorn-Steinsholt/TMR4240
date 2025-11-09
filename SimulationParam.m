@@ -5,6 +5,9 @@ mu = 0.001;
 Vc = -0.5;
 U_bar = 10;
 
+%% Wind Parameters
+windAngNed = deg2rad(0);
+
 % Wind Feed Forward parameters
 rho_a = 1.247; % assuming temp = 10*C
 
