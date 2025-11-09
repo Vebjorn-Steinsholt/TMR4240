@@ -25,6 +25,11 @@ eta0 = [0,0,0,0,0,0]';
 nu0 = [0,0,0,0,0,0]';
 
 windAngle = 0;
+%Thrust allocation starting point
+
+alpha0 = [pi/2; 0; pi/2; -pi/6; pi/6];
+f_max = [125; 150; 125; 300; 300] * 1000;
+f0 = f_max/1000;
 
 % PID controller
 [Kp, Ki, Kd] = init_pid(vessel);
