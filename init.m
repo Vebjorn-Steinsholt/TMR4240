@@ -36,7 +36,7 @@ f0 = f_max/1000;
 
 
 
-t_end = 300;
+t_end = 100;
 h = 0.1;
 
 %Non-linear Observer
