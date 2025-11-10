@@ -150,6 +150,10 @@ simOut = sim(mdl, 'SrcWorkspace','current');
 t_ship = simOut.tout;
 X_ship = reshape(simOut.actual_values, 6, [])';
 %F_env = simOut.env_forces;
+y_thrusters = simOut.thrust_output;
+des_thrusters = reshape(simOut.thrust_desired, 6, []);
+mag_ang_thrusters = reshape(simOut.thrust_force_angle, 10, []);
+
 
 %% Plots
 % Extract vessel states (positions & heading)
@@ -271,3 +275,80 @@ legend('Ship','Reference','Location','best');
 % Optional: start markers and heading arrows
 plot(x_ship(1), y_ship(1), 'o', 'MarkerSize',6, 'HandleVisibility','off');
 plot(x_ref(1),  y_ref(1),  'o', 'MarkerSize',6, 'HandleVisibility','off');
+
+% %% === Thruster desired vs output (per thruster, same axes) ===
+% % y_thrusters: output after dynamics
+% % des_thrusters: desired thruster forces (set-points)
+% % Converts to [Nt x nT], matches column counts, plots both traces.
+% 
+% % --- helper to coerce array to [Nt x N] given time vector t_ship
+% coerceNtByN = @(M,tv) ...
+%     ( size(M,1)==numel(tv) ) .* M + ...
+%     ( size(M,2)==numel(tv) ) .* M.' + ...
+%     ( (size(M,1)~=numel(tv)) && (size(M,2)~=numel(tv)) ) .* reshape(M, [], numel(tv)).';
+% 
+% Yt = coerceNtByN(y_thrusters, t_ship);      % output
+% Td = coerceNtByN(des_thrusters, t_ship);    % desired
+% 
+% % If counts differ, plot the common subset
+% nT = min(size(Yt,2), size(Td,2));
+% Yt = Yt(:,1:nT);
+% Td = Td(:,1:nT);
+% 
+% % Unit scaling (use kN for readability)
+% scale   = 1e-3;     % set to 1 to keep N
+% unitLbl = 'kN';
+% 
+% figure('Name','Thruster Desired vs Output','Color','w');
+% for i = 1:nT
+%     subplot(nT,1,i)
+%     plot(t_ship, Td(:,i)*scale, '--', 'LineWidth', 1.4); hold on
+%     plot(t_ship, Yt(:,i)*scale, '-',  'LineWidth', 1.6);
+%     grid on
+%     ylabel(sprintf('T_%d [%s]', i, unitLbl));
+%     if i==1, title('Desired (set-point) vs Output (after dynamics)'); end
+%     if i==nT, xlabel('Time [s]'); end
+%     legend('Desired','Output','Location','best');
+% end
+% 
+% 
+% %% === Thrust allocation commands: magnitude & angle (mag_ang_thrusters) ===
+% % mag_ang_thrusters is expected to be:
+% %   [ T1; T2; ...; TnT;  alpha1; alpha2; ...; alphanT ]  (angles in rad)
+% MA = mag_ang_thrusters;
+% % Coerce to [nRows x Nt] with rows stacked by signal
+% if size(MA,2) ~= numel(t_ship)
+%     MA = reshape(MA, size(MA,1), []);  % ensure 2D
+% end
+% nRows = size(MA,1);
+% nT2   = nRows/2;                        % magnitudes + angles
+% if abs(nT2 - round(nT2)) > eps
+%     error('mag_ang_thrusters must have 2*m rows (magnitudes, then angles).');
+% end
+% 
+% mag_cmd = MA(1:nT2, :);                 % [nT x Nt]
+% ang_cmd = MA(nT2+1:end, :);             % [nT x Nt]
+% % Transpose to [Nt x nT] for plotting
+% mag_cmd = mag_cmd.';                    % [Nt x nT]
+% ang_cmd = ang_cmd.';                    % [Nt x nT]
+% ang_deg = rad2deg(unwrap(ang_cmd));     % deg, unwrap for readability
+% 
+% % Magnitudes
+% figure('Name','Thrust allocation: commanded magnitudes','Color','w');
+% for i = 1:nT2
+%     subplot(nT2,1,i)
+%     plot(t_ship, mag_cmd(:,i)*scale, 'LineWidth',1.5); grid on
+%     ylabel(sprintf('|T_%d| [%s]', i, unitLbl))
+%     if i==1, title('Commanded thrust magnitudes'); end
+% end
+% xlabel('Time [s]');
+% 
+% % Angles
+% figure('Name','Thrust allocation: commanded angles','Color','w');
+% for i = 1:nT2
+%     subplot(nT2,1,i)
+%     plot(t_ship, ang_deg(:,i), 'LineWidth',1.5); grid on
+%     ylabel(sprintf('\\alpha_%d [deg]', i))
+%     if i==1, title('Commanded thrust azimuth angles'); end
+% end
+% xlabel('Time [s]');

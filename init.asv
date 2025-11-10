@@ -36,7 +36,7 @@ f0 = f_max/1000;
 
 
 
-t_end = 300;
+t_end = 100;
 h = 0.1;
 
 %Non-linear Observer
@@ -150,6 +150,9 @@ simOut = sim(mdl, 'SrcWorkspace','current');
 t_ship = simOut.tout;
 X_ship = reshape(simOut.actual_values, 6, [])';
 %F_env = simOut.env_forces;
+y_thrusters = simOut.thrust_output;
+des_thrusters = reshape(simOut.thrust_desired, 6, []);
+
 
 %% Plots
 % Extract vessel states (positions & heading)
@@ -271,3 +274,4 @@ legend('Ship','Reference','Location','best');
 % Optional: start markers and heading arrows
 plot(x_ship(1), y_ship(1), 'o', 'MarkerSize',6, 'HandleVisibility','off');
 plot(x_ref(1),  y_ref(1),  'o', 'MarkerSize',6, 'HandleVisibility','off');
+
