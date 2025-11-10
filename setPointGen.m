@@ -6,7 +6,7 @@ function [xd,t] = setPointGen(spModeIn, T_final, timeStep)
 spMode = spModeIn; % 1: [0 0 0], 2: single waypoint, 3: multi waypoint, 4: No ref. model
 
 % Position and attitude ref model, based on Fossen, 2021
-T11 = 300; T22 = 300; T33 = 700;
+T11 = 350; T22 = 350; T33 = 560;
 
 omega11 = 2*pi/T11; omega22 = 2*pi/T22; omega33 = 2*pi/T33; % natural freq.
 zeta11 = 1; zeta22 = 1; zeta33 = 1;               % relative damping coeff.
