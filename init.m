@@ -35,7 +35,8 @@ f0 = f_max/1000;
 [Kp, Ki, Kd, M_pid] = init_pid(vessel);
 
 
-t_end = 300;
+
+t_end = 2000;
 h = 0.1;
 
 %Non-linear Observer
