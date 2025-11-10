@@ -40,17 +40,18 @@ h = 0.1;
 
 %Non-linear Observer
 % Mass matrix (M = MRB + MA)
-M = [7.0184e6      0              0;
-     0        8.5464e6   -4.4678e7;
-     0       -4.5028e5    4.0504e9];
+
 
 % Damping matrix (D)
 D = [2.6486e5     0           0;
      0        8.8164e5       0;
      0             0     3.3774e8];
-M_inv = M\eye(3);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+M = vesselABC.MA + vesselABC.MRB;
+idx = [1 2 6];
+M= M(idx, idx);
+M_inv = inv(M);
 
 
 %Wave freqcontrol plant model
@@ -74,30 +75,28 @@ T_mat = [1000 0 0;
 T_inv = T_mat\eye(3);
 %Tuning
 %frequency and damping ratios, ni:deciered, i: actual
-zeta_ni = 1.2;
-zeta_i = 0.2;
-w_i = pi/10;
+
+zeta_ni = 1.1;
+zeta_i = 0.1;
+w_i = pi/9*2;
 w_ci = 1*pi;
 %diagonla values
 k11 = -2*(zeta_ni-zeta_i)*w_ci/w_i;
 k12 = 2*w_i*(zeta_ni-zeta_i);
 k2 = w_ci;
-%k3 = 7e5;
-%k4 = k3*10;
 %Observer Gains matrixes
 K1 = [k11 0 0;
-      0 k11 0;
+      0 k11*2 0;
       0 0 k11;
       k12 0 0;
       0 k12 0;
-      0 0 k12;]*3;
+      0 0 k12;]*4;
 K2 = [k2 0 0;
       0 k2 0;
-      0 0 k2]*2;
-K4 = [7.0184e6      0              0;
-     0        10.5464e6    0;
-     0       0   4.0504e9]*0.1;
+      0 0 k2];
+K4 = M*0.1;
 K3 = K4*0.2;
+
 
 %Harris wind spectrum
 % parameters
