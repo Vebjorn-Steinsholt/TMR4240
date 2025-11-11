@@ -30,6 +30,7 @@ windAngle = 0;
 alpha0 = [pi/2; 0; pi/2; -pi/6; pi/6];
 f_max = [125; 150; 125; 300; 300] * 1000;
 f0 = f_max/1000;
+thruster_config = [1 1 1 1 1];
 
 % PID controller
 [Kp, Ki, Kd, M_pid] = init_pid(vessel);
