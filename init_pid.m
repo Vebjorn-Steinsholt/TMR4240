@@ -20,11 +20,11 @@ vessel = computeManeuveringModel(vessel, omega_p, plotFlag);
 idx = [1 2 6];
 MRB = vessel.MRB(idx, idx);
 MA = vessel.A_eq(idx, idx, 1 , 1);
-%M = MRB + MA;
+M = MRB + MA;
 
 D = vessel.B_eq(idx, idx, 1 , 1);
 
-M = vessel.MRB(idx, idx) + vessel.A(idx,idx);
+% M = vessel.MRB(idx, idx) + vessel.A(idx,idx);
 
 % M = [7.0184e6      0              0;
 %      0        8.5464e6   -4.4678e7;
