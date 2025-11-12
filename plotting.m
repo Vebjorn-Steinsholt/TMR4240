@@ -1,157 +1,8 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% init()                                                                  %
-%                                                                         %              
-% Set initial parameters for part1.slx and part2.slx                      %
-%                                                                         %
-% Created:      2018.07.12	Jon Bjørnø                                    %
-%                                                                         %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-clear; clc; close all;
-
-load('thrusters_sup.mat')
-load('supply.mat');
-load('supplyABC.mat');
-
-[dpMode, observerMode, currentMode, windMode, waveFlag, ctrlFlag] = simOptions();
-
-SimulationParam
-windCoefficients
-
-
-% Initial position x, y, z, phi, theta, psi
-eta0 = [0,0,0,0,0,0]';
-% Initial velocity u, v, w, p, q, r
-nu0 = [0,0,0,0,0,0]';
-
-windAngle = 0;
-%Thrust allocation starting point
-
-alpha0 = [pi/2; 0; pi/2; -pi/6; pi/6];
-f_max = [125; 150; 125; 300; 300] * 1000;
-f0 = f_max/1000;
-
-% PID controller
-[Kp, Ki, Kd, M_pid] = init_pid(vessel);
-
-
-
-t_end = 3000;
-h = 0.1;
-
-%Non-linear Observer
-% Mass matrix (M = MRB + MA)
-
-
-% Damping matrix (D)
-D = [2.6486e5     0           0;
-     0        8.8164e5       0;
-     0             0     3.3774e8];
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-M = vesselABC.MA + vesselABC.MRB;
-idx = [1 2 6];
-M= M(idx, idx);
-M_inv = inv(M);
-
-
-%Wave freqcontrol plant model
-%frequency
-omega_mat = [pi/10 0 0;
-            0 pi/10 0;
-            0 0 pi/10];
-%damping ration
-zeta_mat = [1 0 0;
-            0 1 0;
-            0 0 1];
-%system matrix
-Aw = [zeros(3) eye(3);
-    -omega_mat^2 -2*zeta_mat*omega_mat];
-%Measurement matrix
-Cw = [zeros(3) eye(3)];
-%Bias time constat matrix
-T_mat = [1000 0 0;
-        0 1000 0;
-        0 0 1000];
-T_inv = T_mat\eye(3);
-%Tuning
-%frequency and damping ratios, ni:deciered, i: actual
-
-zeta_ni = 1.1;
-zeta_i = 0.1;
-w_i = pi/9*2;
-w_ci = 1*pi;
-%diagonla values
-k11 = -2*(zeta_ni-zeta_i)*w_ci/w_i;
-k12 = 2*w_i*(zeta_ni-zeta_i);
-k2 = w_ci;
-%Observer Gains matrixes
-K1 = [k11 0 0;
-      0 k11*2 0;
-      0 0 k11;
-      k12 0 0;
-      0 k12 0;
-      0 0 k12;]*4;
-K2 = [k2 0 0;
-      0 k2 0;
-      0 0 k2];
-K4 = M*0.1;
-K3 = K4*0.2;
-
-
-%Harris wind spectrum
-% parameters
-dt = 0.001;
-t = 0:dt:500;
-
-Kappa = 0.0026; 
-L = 1800; 
-U_bar = 10;
-
-f = linspace(0.001, 0.01, 200);
-df = f(2)-f(1);                       
-phaseAngle = 2*pi*rand(1, numel(f));
-
-% Harris spectrum (Eq. 6.30)
-f_tilde = L*f/U_bar;
-S = (4*Kappa*L*U_bar) ./ ((2 + f_tilde.^2).^(5/6));
-
-% Wind gust
-U_gi = real( sum( sqrt(2*S*df) .* cos(2*pi*(t.'*f) + phaseAngle), 2 ) );
-% Lag Simulink-kompatibel struktur (fra workspace)
-wind_data.time = t';
-wind_data.signals.values = U_gi;
-wind_data.signals.dimensions = 1;
-
-% Lagre i .mat for bruk i From Workspace
-save('wind_data.mat', 'wind_data');
-
-%plot(t, U_gi)
-
-%varying wind direction
-psi_wind_0 = deg2rad(180);
-psi_max = psi_wind_0 + deg2rad(5);
-psi_min = psi_wind_0 - deg2rad(5);
-mu_w = 0.001;
-
-% varying current 
-psi_current = deg2rad(90);
-
-% Generate vessel trajectory
-[xd_setpoint, t] = setPointGen(dpMode, t_end, dt);
-
-simin = timeseries(xd_setpoint(1:6,:),t);
-
-% Run Simulink model and extract outputs
-mdl = 'part2';
-simOut = sim(mdl, 'SrcWorkspace','current');
-
+%% Plots
 % Extract simulation outputs
 t_ship = simOut.tout;
 X_ship = reshape(simOut.actual_values, 6, [])';
-%F_env = simOut.env_forces;
-
-%% Plots
+X_obs = reshape(simOut.estimated_values, 6, [])';
 % Extract vessel states (positions & heading)
 x_ship   = X_ship(:,1);   % surge position (x)
 y_ship   = X_ship(:,2);   % sway position (y)
@@ -161,6 +12,17 @@ psi_ship = X_ship(:,3);   % heading (yaw)
 u_ship   = X_ship(:,4);   % surge rate (u)
 v_ship   = X_ship(:,5);   % sway rate (v)
 r_ship   = X_ship(:,6);  % yaw rate (r)
+
+%For estimated position
+% Extract observer (estimated) states (positions & heading)
+x_obs   = X_obs(:,1);   % estimated surge position (x)
+y_obs   = X_obs(:,2);   % estimated sway position (y)
+psi_obs = X_obs(:,3);   % estimated heading (yaw)
+
+% Extract observer (estimated) velocities
+u_obs   = X_obs(:,4);   % estimated surge rate (u)
+v_obs   = X_obs(:,5);   % estimated sway rate (v)
+r_obs   = X_obs(:,6);   % estimated yaw rate (r)
 
 % Extract reference from xd_setpoint 
 x_ref_full   = xd_setpoint(1,:).';
@@ -186,10 +48,13 @@ psi_ship_u   = unwrap(psi_ship);
 psi_ref_u    = unwrap(psi_ref);
 psi_ship_deg = rad2deg(psi_ship_u);
 psi_ref_deg  = rad2deg(psi_ref_u);
+psi_obs_u   = unwrap(psi_obs);
+psi_obs_deg = rad2deg(psi_obs_u);   % convert to degrees for plotting
 
 % Convert yaw rates to deg/s for readability (matches your psi in deg)
 r_ship_deg = rad2deg(r_ship);
 r_ref_deg  = rad2deg(r_ref);
+r_obs_deg = rad2deg(r_obs);
 
 % Choose plot limits from DP mode
 if dpMode == 1
@@ -206,7 +71,7 @@ end
 
 % Position and heading: surge (x), sway (y), yaw rate (psi)
 figure;
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Sim1
 % Surge (x)
 subplot(3,1,1)
 plot(t_ship, x_ship, 'LineWidth',1.5); hold on;
@@ -271,3 +136,107 @@ legend('Ship','Reference','Location','best');
 % Optional: start markers and heading arrows
 plot(x_ship(1), y_ship(1), 'o', 'MarkerSize',6, 'HandleVisibility','off');
 plot(x_ref(1),  y_ref(1),  'o', 'MarkerSize',6, 'HandleVisibility','off');
+
+
+%%%%%%%%%%%%%%%Sim4
+figure;
+% Surge (x)
+subplot(3,1,1)
+plot(t_ship, x_ship, 'LineWidth',1.5); hold on;
+plot(t_ship, x_obs, "-", 'LineWidth',1.5); hold on;
+plot(t_ship, x_ref,  '--', 'LineWidth',1.5);
+grid on; ylabel('x [m]'); title('Surge (position)');
+legend('Ship',"Observer",'Reference','Location','best');
+%ylim(posXLim);
+
+% Sway (y)
+subplot(3,1,2)
+plot(t_ship, y_ship, 'LineWidth',1.5); hold on;
+plot(t_ship, y_obs, 'LineWidth',1.5); hold on;
+plot(t_ship, y_ref,  '--', 'LineWidth',1.5);
+grid on; ylabel('y [m]'); title('Sway (position)');
+legend('Ship',"Observer",'Reference','Location','best');
+%ylim(posYLim);
+
+% Heading (psi)
+subplot(3,1,3);
+plot(t_ship, psi_ship_deg, 'LineWidth',1.5); hold on;
+plot(t_ship, psi_obs_deg, 'LineWidth',1.5); hold on;
+plot(t_ship, psi_ref_deg,  '--', 'LineWidth',1.5);
+grid on; ylabel('$\psi$ [deg]'); xlabel('Time [s]'); title('Heading');
+legend('Ship',"Observer",'Reference','Location','best');
+%ylim(headingLim);
+
+%% FIGURE: Velocity Comparison (u, v, r)
+figure;
+
+% Surge rate (u)
+subplot(3,1,1)
+plot(t_ship, u_ship, 'LineWidth',1.5); hold on;
+plot(t_ship, u_obs, "-", 'LineWidth',1.5); hold on;
+plot(t_ship, u_ref,  '--', 'LineWidth',1.5);
+grid on;
+ylabel('u [m/s]');
+title('Surge Velocity');
+legend('Ship', 'Observer', 'Reference', 'Location', 'best');
+
+% Sway rate (v)
+subplot(3,1,2)
+plot(t_ship, v_ship, 'LineWidth',1.5); hold on;
+plot(t_ship, v_obs, "-", 'LineWidth',1.5); hold on;
+plot(t_ship, v_ref,  '--', 'LineWidth',1.5);
+grid on;
+ylabel('v [m/s]');
+title('Sway Velocity');
+legend('Ship', 'Observer', 'Reference', 'Location', 'best');
+
+% Yaw rate (r)
+subplot(3,1,3)
+plot(t_ship, r_ship_deg, 'LineWidth',1.5); hold on;
+plot(t_ship, r_obs_deg, "-", 'LineWidth',1.5); hold on;
+plot(t_ship, r_ref_deg,  '--', 'LineWidth',1.5);
+grid on;
+ylabel('r [deg/s]');
+xlabel('Time [s]');
+title('Yaw Rate');
+legend('Ship', 'Observer', 'Reference', 'Location', 'best');
+
+%% Plot tau_d (desired forces) vs thrustDynamic (actual thrusts)
+figure('Name','Desired vs Actual Thrust Forces','Color','w');
+
+% Extract data
+t_tau_d = simOut.tau_d.Time;
+data_tau_d = simOut.tau_d.Data;              % [30001 x 6]
+
+t_thrustDynamic = simOut.thrustDynamic.Time;
+data_thrustDynamic = simOut.thrustDynamic.Data;  % [30001 x 6]
+
+% --- Combined plot: tau_d and thrustDynamic ---
+for i = 1:size(data_tau_d,2)
+    subplot(size(data_tau_d,2),1,i)
+    plot(t_tau_d, data_tau_d(:,i), 'k--', 'LineWidth', 1.5); hold on;
+    plot(t_thrustDynamic, data_thrustDynamic(:,i), 'LineWidth', 1.5);
+    grid on;
+    ylabel(sprintf('DOF %d [N or NÂ·m]', i));
+    if i == 1
+        title('Desired Control Forces (\tau_d) vs Thrust Dynamics');
+    end
+    if i == size(data_tau_d,2)
+        xlabel('Time [s]');
+    end
+    legend('\tau_d (desired)','ThrustDynamic (actual)','Location','best');
+end
+
+%% Plot thrust allocation separately
+figure('Name','Thrust Allocation','Color','w');
+
+t_thrustAlloc = simOut.thrustAlloc.Time;
+data_thrustAlloc = squeeze(simOut.thrustAlloc.Data);   % [5 x 1 x 30001] â†’ [5 x 30001]
+data_thrustAlloc = data_thrustAlloc.';                 % transpose to [30001 x 5]
+
+plot(t_thrustAlloc, data_thrustAlloc, 'LineWidth', 1.5);
+grid on;
+xlabel('Time [s]');
+ylabel('Force [N]');
+title('Thrust Allocation (per thruster)');
+legend(compose('Thruster %d', 1:size(data_thrustAlloc,2)), 'Location','best');
