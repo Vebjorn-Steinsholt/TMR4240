@@ -151,9 +151,9 @@ simOut = sim(mdl, 'SrcWorkspace','current');
 t_ship = simOut.tout;
 X_ship = reshape(simOut.actual_values, 6, [])';
 %F_env = simOut.env_forces;
-y_thrusters = simOut.thrust_output;
-des_thrusters = reshape(simOut.thrust_desired, 6, []);
-mag_ang_thrusters = reshape(simOut.thrust_force_angle, 10, []);
+% y_thrusters = simOut.thrust_output;
+% des_thrusters = reshape(simOut.thrust_desired, 6, []);
+% mag_ang_thrusters = reshape(simOut.thrust_force_angle, 10, []);
 
 
 %% Plots
